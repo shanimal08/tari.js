@@ -14,6 +14,71 @@ export function App() {
     void handleConnect();
   }, [handleConnect, status]);
 
+  const sidebarMarkup = (
+    <aside className="sidebar">
+      <div className="sidebar-header">
+        <h2 className="panel-title">Templates</h2>
+      </div>
+      {templateList.length === 0 && <p className="empty-state">{"No templates found."}</p>}
+      <div className="template-list">
+        {templateList.map((t) => (
+          <TemplateRow
+            key={t.address}
+            template={t}
+            selected={selectedAddress === t.address}
+            onSelect={() => void selectTemplate(t.address)}
+          />
+        ))}
+      </div>
+    </aside>
+  );
+
+  const templateDetailsMarkup = (
+    <main className="detail">
+      {!selectedAddress && (
+        <div className="empty-detail">
+          <DotLogo size={48} />
+          <p>Select a template to inspect its ABI</p>
+        </div>
+      )}
+
+      {selectedAddress && (
+        <>
+          <div className="detail-header">
+            <h2 className="panel-title">
+              Template: <b>{definition?.V1.template_name}</b>
+            </h2>
+            <span className="mono address-chip" title={selectedAddress}>
+              {truncate(selectedAddress, 14, 10)}
+            </span>
+          </div>
+
+          {definitionLoading && (
+            <div className="loading-state">
+              <Spinner dark /> Fetching definition…
+            </div>
+          )}
+
+          {definitionError && (
+            <div className="error-banner" role="alert">
+              {definitionError}
+            </div>
+          )}
+
+          {definition && !definitionLoading && <DefinitionView definition={definition} />}
+        </>
+      )}
+    </main>
+  );
+
+  const transactMarkup = (
+    <main className="detail smaller">
+      <div className="detail-header">
+        <h2 className="panel-title">Transact</h2>
+      </div>
+    </main>
+  );
+
   return (
     <div className="layout">
       <header className="topbar">
@@ -27,60 +92,9 @@ export function App() {
         </div>
       </header>
       <div className="body">
-        {/* ── Left: template list ── */}
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <h2 className="panel-title">Templates</h2>
-          </div>
-
-          {templateList.length === 0 && <p className="empty-state">{"No templates found."}</p>}
-
-          <div className="template-list">
-            {templateList.map((t) => (
-              <TemplateRow
-                key={t.address}
-                template={t}
-                selected={selectedAddress === t.address}
-                onSelect={() => void selectTemplate(t.address)}
-              />
-            ))}
-          </div>
-        </aside>
-
-        {/* ── Right: definition viewer ── */}
-        <main className="detail">
-          {!selectedAddress && (
-            <div className="empty-detail">
-              <DotLogo size={48} />
-              <p>Select a template to inspect its ABI</p>
-            </div>
-          )}
-
-          {selectedAddress && (
-            <>
-              <div className="detail-header">
-                <h2 className="panel-title">ABI</h2>
-                <span className="mono address-chip" title={selectedAddress}>
-                  {truncate(selectedAddress, 14, 10)}
-                </span>
-              </div>
-
-              {definitionLoading && (
-                <div className="loading-state">
-                  <Spinner dark /> Fetching definition…
-                </div>
-              )}
-
-              {definitionError && (
-                <div className="error-banner" role="alert">
-                  {definitionError}
-                </div>
-              )}
-
-              {definition && !definitionLoading && <DefinitionView definition={definition} />}
-            </>
-          )}
-        </main>
+        {sidebarMarkup}
+        {templateDetailsMarkup}
+        {transactMarkup}
       </div>
     </div>
   );

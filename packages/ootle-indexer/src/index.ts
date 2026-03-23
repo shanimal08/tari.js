@@ -12,6 +12,7 @@ export type {
   TemplateMetadata,
   GetTemplateDefinitionResponse,
   TemplateDef,
+  FunctionDef,
 } from "@tari-project/ootle-ts-bindings";
 
 export { ProviderBuilder } from "./provider-builder";

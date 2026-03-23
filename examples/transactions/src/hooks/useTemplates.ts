@@ -19,7 +19,7 @@ export function useTemplates({ provider }: { provider: IndexerProvider | null })
         const res = await client
           .getTransport()
           .sendGet<{ templates?: TemplateMetadata[] }>("templates/cached", { limit: 50 });
-        console.debug(`res =`, res);
+
         if (res?.templates) {
           setTemplateList(res.templates);
         }

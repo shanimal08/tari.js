@@ -1,5 +1,5 @@
 import "./App.css";
-import type { TemplateMetadata, TemplateDef } from "@tari-project/ootle-indexer";
+import type { TemplateMetadata, TemplateDef, FunctionDef } from "@tari-project/ootle-indexer";
 import { useState } from "react";
 
 function DotLogo({ size = 40 }: { size?: number }) {
@@ -55,29 +55,18 @@ function DefinitionView({ definition }: { definition: TemplateDef }) {
   return <pre className="json-view">{JSON.stringify(definition, null, 2)}</pre>;
 }
 
-interface AbiFunction {
-  name: string;
-  arguments?: AbiArg[];
-  output?: unknown;
-  is_constructor?: boolean;
-}
-
 type V1 = TemplateDef["V1"];
 type TemplateFns = V1["functions"];
 
-interface AbiArg {
-  name?: string;
-  arg_type?: unknown;
-}
+type FuncType = FunctionDef["output"];
 
-function FunctionCard({ fn }: { fn: AbiFunction }) {
+function FunctionCard({ fn }: { fn: FunctionDef }) {
   const [expanded, setExpanded] = useState(false);
-
   return (
-    <div className={`fn-card ${fn.is_constructor ? "constructor" : ""}`}>
+    <div className={`fn-card ${!fn.is_mut ? "constructor" : ""}`}>
       <button className="fn-header" onClick={() => setExpanded((x) => !x)}>
         <div className="fn-sig">
-          {fn.is_constructor && <span className="fn-badge constructor">new</span>}
+          {fn.is_mut && <span className="fn-badge constructor">mut</span>}
           <span className="fn-name mono">{fn.name}</span>
           <span className="fn-args-preview">({(fn.arguments ?? []).map((a) => a.name ?? "_").join(", ")})</span>
         </div>
@@ -93,7 +82,7 @@ function FunctionCard({ fn }: { fn: AbiFunction }) {
                 {fn.arguments.map((arg, i) => (
                   <div key={i} className="arg-row">
                     <span className="arg-name mono">{arg.name ?? `arg${i}`}</span>
-                    <span className="arg-type mono">{typeToString(arg.arg_type)}</span>
+                    <span className="arg-type mono">{getTypeAsString(arg.arg_type)}</span>
                   </div>
                 ))}
               </div>
@@ -103,7 +92,7 @@ function FunctionCard({ fn }: { fn: AbiFunction }) {
           {fn.output !== undefined && fn.output !== null && (
             <div className="fn-section">
               <p className="fn-section-label">Returns</p>
-              <span className="arg-type mono">{typeToString(fn.output)}</span>
+              <span className="arg-type mono">{getTypeAsString(fn.output)}</span>
             </div>
           )}
 
@@ -151,32 +140,28 @@ function extractFunctions(def: TemplateDef): TemplateFns {
   return [];
 }
 
-function typeToString(t: unknown): string {
-  if (t === null || t === undefined) return "()";
-  if (typeof t === "string") return t;
-  if (typeof t === "object") {
-    const o = t as Record<string, unknown>;
-    // Handle common Tari type shapes like { Other: { name: "Foo" } }, { I64: {} }, etc.
-    const key = Object.keys(o)[0];
-    if (!key) return "{}";
-    const val = o[key];
-    if (val && typeof val === "object") {
-      const inner = val as Record<string, unknown>;
-      return typeToString(inner);
-    }
-    return key;
+function getTypeAsString(funcType: FuncType): string {
+  if (typeof funcType === "string") {
+    return funcType;
   }
-  return Object.values(t).map(toString).join(",");
+
+  const funcTypeKeys = Object.keys(funcType);
+  if (funcTypeKeys.length > 0) {
+    switch (funcTypeKeys[0]) {
+      case "Vec": {
+        return getTypeAsString(funcType["Vec" as keyof typeof funcType]);
+      }
+      case "Tuple": {
+        return JSON.stringify(funcType["Tuple" as keyof typeof funcType]);
+      }
+      case "Other": {
+        const other = funcType["Other" as keyof typeof funcType] as { name: string };
+        return other.name;
+      }
+    }
+  }
+
+  return "Unknown";
 }
 
-export {
-  DotLogo,
-  TemplateRow,
-  DefinitionView,
-  FunctionCard,
-  Spinner,
-  ChevronIcon,
-  truncate,
-  extractFunctions,
-  typeToString,
-};
+export { DotLogo, TemplateRow, DefinitionView, FunctionCard, Spinner, ChevronIcon, truncate, extractFunctions };
