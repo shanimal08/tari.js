@@ -1,6 +1,6 @@
 import "./App.css";
 import type { TemplateMetadata, TemplateDef, FunctionDef } from "@tari-project/ootle-indexer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function DotLogo({ size = 40 }: { size?: number }) {
   return (
@@ -33,19 +33,34 @@ function TemplateRow({
   );
 }
 
+interface DefinitionViewProps {
+  definition: TemplateDef;
+  onSelected: (fnDef: FunctionDef) => void;
+}
 /**
  * Renders the template definition. The exact shape of GetTemplateDefinitionResponse
  * is determined by the on-chain data. We try to render known fields (functions list)
  * nicely, and fall back to a formatted JSON dump.
  */
-function DefinitionView({ definition }: { definition: TemplateDef }) {
+function DefinitionView({ definition, onSelected }: DefinitionViewProps) {
+  const [selectedIdx, setSelectedIdx] = useState<number | undefined>(undefined);
+  function handleSelected(fnDef: FunctionDef, idx: number) {
+    setSelectedIdx(idx);
+    onSelected(fnDef);
+  }
   // Try to extract a functions array from known response shapes
   const functions = extractFunctions(definition);
   if (functions.length > 0) {
     return (
       <div className="abi-view">
         {functions.map((fn, i) => (
-          <FunctionCard key={i} fn={fn} />
+          <FunctionCard
+            key={i}
+            fn={fn}
+            fnIndex={i}
+            selectedIdx={selectedIdx}
+            onSelected={(fnDef) => handleSelected(fnDef, i)}
+          />
         ))}
       </div>
     );
@@ -60,11 +75,31 @@ type TemplateFns = V1["functions"];
 
 type FuncType = FunctionDef["output"];
 
-function FunctionCard({ fn }: { fn: FunctionDef }) {
+function FunctionCard({
+  fn,
+  fnIndex,
+  selectedIdx,
+  onSelected,
+}: {
+  fn: FunctionDef;
+  fnIndex: number;
+  onSelected: (fnDef: FunctionDef) => void;
+  selectedIdx?: number;
+}) {
   const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    setExpanded(fnIndex === selectedIdx);
+  }, [fnIndex, selectedIdx]);
+
+  function handleClick() {
+    onSelected(fn);
+    setExpanded(true);
+  }
+
   return (
     <div className={`fn-card ${!fn.is_mut ? "constructor" : ""}`}>
-      <button className="fn-header" onClick={() => setExpanded((x) => !x)}>
+      <button className="fn-header" onClick={handleClick}>
         <div className="fn-sig">
           {fn.is_mut && <span className="fn-badge constructor">mut</span>}
           <span className="fn-name mono">{fn.name}</span>

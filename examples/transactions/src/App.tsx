@@ -1,10 +1,13 @@
 import "./App.css";
 import { DefinitionView, DotLogo, Spinner, TemplateRow, truncate } from "./components.tsx";
+import type { FunctionDef } from "@tari-project/ootle-indexer";
 import { useConnect } from "./hooks/useConnect.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTemplates } from "./hooks/useTemplates.ts";
+import Transact from "./Transact.tsx";
 
 export function App() {
+  const [selectedFn, setSelectedFn] = useState<FunctionDef | null>(null);
   const { status, provider, handleConnect } = useConnect();
   const { templateList, selectTemplate, selectedAddress, definition, definitionLoading, definitionError } =
     useTemplates({ provider });
@@ -65,17 +68,20 @@ export function App() {
             </div>
           )}
 
-          {definition && !definitionLoading && <DefinitionView definition={definition} />}
+          {definition && !definitionLoading && <DefinitionView definition={definition} onSelected={setSelectedFn} />}
         </>
       )}
     </main>
   );
 
-  const transactMarkup = (
+  const renderTransact = Boolean(selectedAddress?.length && !definitionLoading && definition);
+
+  const transactMarkup = renderTransact && (
     <main className="detail smaller">
       <div className="detail-header">
         <h2 className="panel-title">Transact</h2>
       </div>
+      <Transact selectedFunction={selectedFn} />
     </main>
   );
 
