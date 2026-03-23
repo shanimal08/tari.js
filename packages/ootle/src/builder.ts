@@ -17,7 +17,7 @@ import type {
   AllocatableAddressType,
 } from "@tari-project/ootle-ts-bindings";
 import { Network } from "./network";
-import { parseWorkspaceStringKey } from "./helpers/workspace";
+import { parseWorkspaceStringKey } from "./helpers";
 
 /** A function that can be called on a published template. */
 export interface TariFunctionDefinition {
@@ -99,7 +99,7 @@ export class TransactionBuilder {
     }
     const call = method.componentAddress
       ? { Address: method.componentAddress }
-      : { Workspace: this.requireNamedId(method.fromWorkspace!) };
+      : { Workspace: this.requireNamedId(method.fromWorkspace) };
     const resolvedArgs = this.resolveArgs(args);
     return this.addInstruction({
       CallMethod: {
@@ -266,7 +266,10 @@ export class TransactionBuilder {
     return this.allocatedIds.get(name);
   }
 
-  private requireNamedId(name: string): number {
+  private requireNamedId(name?: string): number {
+    if (name === undefined) {
+      throw new Error(`Workspace name is required for this operation.`);
+    }
     const id = this.allocatedIds.get(name);
     if (id === undefined) {
       throw new Error(`No workspace variable named "${name}" has been defined`);

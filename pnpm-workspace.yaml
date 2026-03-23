@@ -2,7 +2,7 @@ packages:
   - packages/*
   - apps/*
   - docs
-  - examples/*
+  - "!**/examples/**"
   - "!**/test/**"
 
 catalog:
@@ -13,7 +13,7 @@ catalog:
   "@tari-project/ootle-wasm": ^0.3.0
   "@tari-project/wallet_jrpc_client": ^1.14.0
   "@types/node": ^25.5.0
-  eslint: ^10.0.3
+  eslint: ^10.1.0
   eslint-config-prettier: ^10.1.8
   knip: ^6.0.0
   prettier: ^3.8.1
