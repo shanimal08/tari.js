@@ -2,7 +2,7 @@ packages:
   - packages/*
   - apps/*
   - docs
-  - "!**/examples/**"
+  - examples/*
   - "!**/test/**"
 
 catalog:
