@@ -8,7 +8,8 @@ interface TransactProps {
 
 const builder = new TransactionBuilder(Network.Esmeralda);
 export default function Transact({ selectedFunction }: TransactProps) {
-  console.debug(`selectedFunction =`, selectedFunction);
+  console.debug(`builder=`, builder);
+
   return selectedFunction ? (
     <div className="abi-view">
       <span className="fn-name mono">{selectedFunction.name}</span>
