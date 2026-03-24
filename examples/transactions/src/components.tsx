@@ -199,6 +199,18 @@ function getTypeAsString(funcType: FuncType): string {
   return "Unknown";
 }
 
+const numTypes = ["I8", "I16", "I32", "I64", "I128", "U8", "U16", "U32", "U64", "U128", "Amount"];
+
+function getInputType(strType: string): string {
+  if (numTypes.includes(strType)) {
+    return "number";
+  }
+  if (strType === "Bool") {
+    return "boolean";
+  }
+  return "text";
+}
+
 export {
   DotLogo,
   TemplateRow,
@@ -209,4 +221,5 @@ export {
   truncate,
   extractFunctions,
   getTypeAsString,
+  getInputType,
 };

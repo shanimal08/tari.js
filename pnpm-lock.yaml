@@ -261,6 +261,9 @@ importers:
       '@tari-project/ootle-indexer':
         specifier: link:../../packages/ootle-indexer
         version: link:../../packages/ootle-indexer
+      '@tari-project/ootle-secret-key-wallet':
+        specifier: link:../../packages/ootle-secret-key-wallet
+        version: link:../../packages/ootle-secret-key-wallet
       react:
         specifier: ^19.2.4
         version: 19.2.4

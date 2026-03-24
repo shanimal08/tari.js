@@ -4,7 +4,7 @@ import type { FunctionDef } from "@tari-project/ootle-indexer";
 import { useConnect } from "./hooks/useConnect.ts";
 import { useEffect, useState } from "react";
 import { useTemplates } from "./hooks/useTemplates.ts";
-import Transact from "./Transact.tsx";
+import { Transact } from "./Transact.tsx";
 
 export function App() {
   const [selectedFn, setSelectedFn] = useState<FunctionDef | null>(null);
@@ -16,6 +16,11 @@ export function App() {
     if (status !== "disconnected") return;
     void handleConnect();
   }, [handleConnect, status]);
+
+  function onTemplateSelect(address: string) {
+    setSelectedFn(null);
+    void selectTemplate(address);
+  }
 
   const sidebarMarkup = (
     <aside className="sidebar">
@@ -29,7 +34,7 @@ export function App() {
             key={t.address}
             template={t}
             selected={selectedAddress === t.address}
-            onSelect={() => void selectTemplate(t.address)}
+            onSelect={() => onTemplateSelect(t.address)}
           />
         ))}
       </div>
@@ -106,8 +111,8 @@ export function App() {
       </header>
       <div className="body">
         {sidebarMarkup}
-        {templateDetailsMarkup}
         {transactMarkup}
+        {templateDetailsMarkup}
       </div>
     </div>
   );
