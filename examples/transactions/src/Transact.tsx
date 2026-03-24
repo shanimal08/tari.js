@@ -1,18 +1,30 @@
-import { FunctionDef } from "@tari-project/ootle-indexer";
+import type { TemplateDef, FunctionDef } from "@tari-project/ootle-indexer";
+
 import { Network, TransactionBuilder } from "@tari-project/ootle";
 import { DotLogo } from "./components.tsx";
-
+type PublishedTemplateAddress = string; // todo export in indexer
 interface TransactProps {
-  selectedFunction: FunctionDef | null;
+  def: TemplateDef;
+  templateAddress: PublishedTemplateAddress;
+  selectedFunction: FunctionDef;
 }
 
 const builder = new TransactionBuilder(Network.Esmeralda);
-export default function Transact({ selectedFunction }: TransactProps) {
-  console.debug(`builder=`, builder);
+export default function Transact({ def, selectedFunction, templateAddress }: TransactProps) {
+  console.debug(`def =`, def);
+  console.debug(`selectedFunction =`, selectedFunction);
+  const b = builder.callFunction(
+    {
+      templateAddress,
+      functionName: selectedFunction.name,
+    },
+    selectedFunction.arguments,
+  );
+  console.debug(`b =`, b);
 
-  return selectedFunction ? (
+  return def ? (
     <div className="abi-view">
-      <span className="fn-name mono">{selectedFunction.name}</span>
+      <span className="fn-name mono">{def.V1.template_name}</span>
     </div>
   ) : (
     <div className="empty-detail">

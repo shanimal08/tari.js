@@ -81,7 +81,9 @@ export function App() {
       <div className="detail-header">
         <h2 className="panel-title">Transact</h2>
       </div>
-      <Transact selectedFunction={selectedFn} />
+      {selectedFn && definition && selectedAddress ? (
+        <Transact selectedFunction={selectedFn} def={definition} templateAddress={selectedAddress} />
+      ) : null}
     </main>
   );
 
