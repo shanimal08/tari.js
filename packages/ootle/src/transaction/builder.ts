@@ -88,7 +88,7 @@ export interface Builder {
   /**
    * Adds a function call to the transaction, allowing the developer to invoke a function on a published template. This implements {@link TariFunctionDefinition}
    * @param func - The function definition to call, which includes the function name, arguments, and template address.
-   * @param args - The arguments to pass to the function. These should be provided as an array of {@link ArgDef} objects. Optional.
+   * @param args - The arguments to pass to the function. These should be provided as an array of {@link NamedArg} objects. Optional.
    * @returns The current instance of the Builder, allowing for method chaining.
    */
   callFunction<T extends TariFunctionDefinition>(func: T, args: Exclude<T["args"], undefined>): this;

@@ -199,4 +199,14 @@ function getTypeAsString(funcType: FuncType): string {
   return "Unknown";
 }
 
-export { DotLogo, TemplateRow, DefinitionView, FunctionCard, Spinner, ChevronIcon, truncate, extractFunctions };
+export {
+  DotLogo,
+  TemplateRow,
+  DefinitionView,
+  FunctionCard,
+  Spinner,
+  ChevronIcon,
+  truncate,
+  extractFunctions,
+  getTypeAsString,
+};
