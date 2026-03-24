@@ -22,7 +22,8 @@
   "dependencies": {
     "@tari-project/ootle": "workspace:",
     "@tari-project/ootle-ts-bindings": "catalog:",
-    "@tari-project/wallet_jrpc_client": "catalog:"
+    "@tari-project/wallet_jrpc_client": "catalog:",
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
