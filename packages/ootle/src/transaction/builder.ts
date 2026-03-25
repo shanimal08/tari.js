@@ -20,7 +20,7 @@ import type {
   TransactionSignature,
 } from "@tari-project/ootle-ts-bindings";
 import { Network } from "../network";
-import { parseWorkspaceStringKey } from "../helpers";
+import { parseWorkspaceStringKey, toHexStr } from "../helpers";
 import { TransactionRequest } from "./request";
 
 /** A function that can be called on a published template. */
@@ -108,7 +108,7 @@ export interface Builder {
    * @returns The current instance of the Builder, allowing for method chaining.
    * @example
    */
-  createAccount(ownerPublicKey: string, workspaceBucket?: string): this;
+  createAccount(ownerPublicKey: Uint8Array, workspaceBucket?: string): this;
 
   /**
    * Creates an internal proof that can be used to prove ownership of a resource in a component's account.
@@ -308,11 +308,11 @@ export class TransactionBuilder implements Builder {
     });
   }
 
-  public createAccount(ownerPublicKey: string, workspaceBucket?: string): this {
+  public createAccount(ownerPublicKey: Uint8Array, workspaceBucket?: string): this {
     const bucket_workspace_id = workspaceBucket ? this.getOffsetIdFromWorkspaceName(workspaceBucket) : null;
     return this.addInstruction({
       CreateAccount: {
-        owner_public_key: ownerPublicKey,
+        owner_public_key: toHexStr(ownerPublicKey),
         owner_rule: null,
         access_rules: null,
         bucket_workspace_id,

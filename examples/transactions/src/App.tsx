@@ -42,7 +42,7 @@ export function App() {
   );
 
   const templateDetailsMarkup = (
-    <main className="detail">
+    <main className="detail smaller">
       {!selectedAddress && (
         <div className="empty-detail">
           <DotLogo size={48} />
@@ -82,18 +82,23 @@ export function App() {
   const renderTransact = Boolean(selectedAddress?.length && !definitionLoading && definition);
 
   const transactMarkup = renderTransact && (
-    <main className="detail smaller">
+    <main className="detail">
       <div className="detail-header">
         <h2 className="panel-title">Transact</h2>
       </div>
-      {selectedFn && definition && selectedAddress ? (
+      {definition && selectedAddress ? (
         <Transact
           key={selectedAddress}
           selectedFunction={selectedFn}
           def={definition}
           templateAddress={selectedAddress}
         />
-      ) : null}
+      ) : (
+        <div className="empty-detail">
+          <DotLogo size={48} />
+          <p>Click a function to transact</p>
+        </div>
+      )}
     </main>
   );
 
