@@ -2,19 +2,20 @@ import "./App.css";
 import { DefinitionView, DotLogo, Spinner, TemplateRow, truncate } from "./components.tsx";
 import type { FunctionDef } from "@tari-project/ootle-indexer";
 import { useConnect } from "./hooks/useConnect.ts";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTemplates } from "./hooks/useTemplates.ts";
 import { Transact } from "./Transact.tsx";
 
 export function App() {
+  const connectionAttempted = useRef(false);
   const [selectedFn, setSelectedFn] = useState<FunctionDef | null>(null);
   const { status, provider, handleConnect } = useConnect();
   const { templateList, selectTemplate, selectedAddress, definition, definitionLoading, definitionError } =
     useTemplates({ provider });
 
   useEffect(() => {
-    if (status !== "disconnected") return;
-    void handleConnect();
+    if (status !== "disconnected" || connectionAttempted.current) return;
+    handleConnect().finally(() => (connectionAttempted.current = true));
   }, [handleConnect, status]);
 
   function onTemplateSelect(address: string) {
@@ -44,9 +45,12 @@ export function App() {
   const templateDetailsMarkup = (
     <main className="detail smaller">
       {!selectedAddress && (
-        <div className="empty-detail">
+        <div className="detail" style={{ alignItems: "center" }}>
           <DotLogo size={48} />
-          <p>Select a template to inspect its ABI</p>
+          <p>
+            After getting the signer pubkey/address, select a template to inspect its ABI and interact with its
+            functions
+          </p>
         </div>
       )}
 
@@ -79,26 +83,18 @@ export function App() {
     </main>
   );
 
-  const renderTransact = Boolean(selectedAddress?.length && !definitionLoading && definition);
-
-  const transactMarkup = renderTransact && (
+  const transactMarkup = (
     <main className="detail">
       <div className="detail-header">
         <h2 className="panel-title">Transact</h2>
       </div>
-      {definition && selectedAddress ? (
-        <Transact
-          key={selectedAddress}
-          selectedFunction={selectedFn}
-          def={definition}
-          templateAddress={selectedAddress}
-        />
-      ) : (
-        <div className="empty-detail">
-          <DotLogo size={48} />
-          <p>Click a function to transact</p>
-        </div>
-      )}
+      <Transact
+        provider={provider}
+        key={selectedAddress}
+        selectedFunction={selectedFn}
+        def={definition}
+        templateAddress={selectedAddress}
+      />
     </main>
   );
 
@@ -116,8 +112,8 @@ export function App() {
       </header>
       <div className="body">
         {sidebarMarkup}
-        {transactMarkup}
         {templateDetailsMarkup}
+        {transactMarkup}
       </div>
     </div>
   );

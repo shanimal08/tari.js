@@ -149,6 +149,7 @@ export interface Builder {
   claimBurn(claim: MinotariBurnClaimProof, output_data: ClaimBurnOutputData): this;
 
   addInput(inputObject: SubstateRequirement): this;
+  addSignatures(signatures: TransactionSignature[]): this;
 
   /** Adds a raw instruction to the transaction.
    *
@@ -280,6 +281,10 @@ export class TransactionBuilder implements Builder {
     return new TransactionBuilder(network);
   }
 
+  public addSignatures(signatures: TransactionSignature[]): this {
+    this.signatures.push(...signatures);
+    return this;
+  }
   public callFunction<T extends TariFunctionDefinition>(func: T, args: Exclude<T["args"], undefined>): this {
     const resolvedArgs = this.resolveArgs(args);
     return this.addInstruction({
